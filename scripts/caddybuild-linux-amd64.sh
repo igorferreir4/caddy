@@ -1,4 +1,4 @@
-xcaddy build --output ./caddy.exe \
+GOOS=linux GOARCH=amd64 xcaddy build --output ./caddy-amd64 \
     --with github.com/caddy-dns/cloudflare \
     --with github.com/mholt/caddy-l4 \
     --with github.com/RussellLuo/caddy-ext/layer4 \

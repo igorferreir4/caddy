@@ -33,9 +33,12 @@ jobs:
       # Build Binaries and set them to executable
       - name: Build Binaries
         run: |
-          sh ./scripts/caddybuild.sh
-          sh ./scripts/caddybuild-win64.sh
-          chmod +x caddy
+          sh ./scripts/caddybuild-linux-amd64.sh
+          sh ./scripts/caddybuild-linux-arm64.sh
+          sh ./scripts/caddybuild-win-amd64.sh
+          sh ./scripts/caddybuild-win-arm64.sh
+          chmod +x caddy-amd64
+          chmod +x caddy-arm64
       # Get the new version of the binary package
       - name: Get Binary Version
         id: caddy_version
@@ -55,5 +58,7 @@ jobs:
           body: |
             Release notes: ${{ steps.get_release_notes.outputs.html_url }}
           files: |
-            caddy
-            caddy.exe
+            caddy-amd64
+            caddy-arm64
+            caddy-amd64.exe
+            caddy-arm64.exe
