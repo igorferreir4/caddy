@@ -11,7 +11,7 @@ on:
 
 ### This section defines the job steps for the action ###
 jobs:
-  build:
+  build-caddy:
     runs-on: ubuntu-latest
     steps:
       # Setup Go
@@ -43,22 +43,19 @@ jobs:
 
       # Build Binaries and set them to executable
       - name: Build Binaries
-        env:
-          CGO_ENABLED: 0
-          GOOS: ${{ matrix.goos }}
         run: |
           sh ./scripts/caddybuild-linux-amd64.sh
           sh ./scripts/caddybuild-linux-arm64.sh
           sh ./scripts/caddybuild-win-amd64.sh
           sh ./scripts/caddybuild-win-arm64.sh
-          chmod +x caddy-amd64
-          chmod +x caddy-arm64
+          chmod +x caddy-linux-amd64
+          chmod +x caddy-linux-arm64
 
       # Get the new version of the binary package
       - name: Get Binary Version
         id: caddy_version
         run: |
-          CADDY=$(./caddy-amd64 version)
+          CADDY=$(./caddy-linux-amd64 version)
           vr="${CADDY}"
           echo "version=$( echo $vr | head -n1 | cut -d " " -f1 )" >> $GITHUB_OUTPUT
           echo "tag_name=$( echo $vr | head -n1 | cut -d " " -f1 )" >> $GITHUB_OUTPUT
@@ -77,7 +74,7 @@ jobs:
           body: |
             Release notes: ${{ steps.get_release_notes.outputs.html_url }}
           files: |
-            caddy-amd64
-            caddy-arm64
-            caddy-amd64.exe
-            caddy-arm64.exe
+            caddy-linux-amd64
+            caddy-linux-arm64
+            caddy-windows-amd64.exe
+            caddy-windows-arm64.exe
