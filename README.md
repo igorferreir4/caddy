@@ -1,6 +1,6 @@
 # Caddy with modules:
 
-```python
+```htm
 github.com/caddy-dns/cloudflare
 github.com/mholt/caddy-l4
 github.com/RussellLuo/caddy-ext/layer4
