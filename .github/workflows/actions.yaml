@@ -20,12 +20,6 @@ jobs:
         with:
           go-version: '>=1.19'
 
-      # Get xcaddy go module
-      - name: Get XCADDY
-        run: |
-          go version
-          go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-
       # Cache
       - name: Cache the build cache
         uses: actions/cache@v3
@@ -33,9 +27,15 @@ jobs:
           path: |
             ~/.cache/go-build
             ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          key: caddy-build-win-linux-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-go-
+            caddy-build-win-linux
+
+      # Get xcaddy go module
+      - name: Get XCADDY
+        run: |
+          go version
+          go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
 
       # Check out local repo
       - name: Pull Local Repo
