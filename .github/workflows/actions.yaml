@@ -12,26 +12,13 @@ on:
 ### This section defines the job steps for the action ###
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        goos: ['linux']
-        go: [ '1.19' ]
-
-        include:
-        # Set the minimum Go patch version for the given Go minor
-        # Usable via ${{ matrix.GO_SEMVER }}
-        - go: '1.19'
-          GO_SEMVER: '~1.19.0'
-
     runs-on: ubuntu-latest
     steps:
       # Setup Go
       - name: Setup Go
         uses: actions/setup-go@v3
         with:
-          go-version: ${{ matrix.GO_SEMVER }}
-          check-latest: true
+          go-version: '>=1.19'
 
       # Get xcaddy go module
       - name: Get XCADDY
@@ -41,17 +28,14 @@ jobs:
 
       # Cache
       - name: Cache the build cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          # In order:
-          # * Module download cache
-          # * Build cache (Linux)
-          path: |
-            ~/go/pkg/mod
-            ~/.cache/go-build
-          key: cross-build-go${{ matrix.go }}-${{ matrix.goos }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            cross-build-go${{ matrix.go }}-${{ matrix.goos }}
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
 
       # Check out local repo
       - name: Pull Local Repo
@@ -76,8 +60,11 @@ jobs:
         run: |
           CADDY=$(./caddy-amd64 version)
           vr="${CADDY}"
-          echo "::set-output name=version::$( echo $vr | head -n1 | cut -d " " -f1 )"
-          echo "::set-output name=tag_name::$( echo $vr | head -n1 | cut -d " " -f1 )"
+          echo "version=$( echo $vr | head -n1 | cut -d " " -f1 )" >> $GITHUB_OUTPUT
+          echo "tag_name=$( echo $vr | head -n1 | cut -d " " -f1 )" >> $GITHUB_OUTPUT
+
+      # echo "::set-output name=version::$( echo $vr | head -n1 | cut -d " " -f1 )"
+      # echo "::set-output name=tag_name::$( echo $vr | head -n1 | cut -d " " -f1 )"
           
       # Create release in repository and attach binaries
       - name: Create Release
