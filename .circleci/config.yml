@@ -7,7 +7,7 @@ executors:
     resource_class: large
 
 orbs:
-  github-cli: circleci/github-cli@2.0.0
+  github-cli: circleci/github-cli@1.1.0
 
 jobs:
   build-caddy-linux-amd64:
@@ -105,14 +105,10 @@ jobs:
             ./artifacts/caddy-linux-amd64 version
             CADDY=$(./artifacts/caddy-linux-amd64 version)
             echo "version=$( echo $CADDY | head -n1 | cut -d " " -f1 )" >> $BASH_ENV
-      - github-cli/release:
-          files: ./artifacts/*
-          title: Binary Update - Caddy "$version"
-          tag: $version
-      # - github-cli/setup
-      # - run:
-      #     command: |
-      #       gh release create "$version" --title "Binary Update - Caddy "$version"" --notes "Automated release from CircleCI" ./artifacts/*
+      - github-cli/setup
+      - run:
+          command: |
+            gh release create $version --title "Binary Update - Caddy "$version"" --notes "Automated release from CircleCI" --repo igorferreir4/caddy ./artifacts/*
       - store_artifacts:
           path: ./artifacts
 
