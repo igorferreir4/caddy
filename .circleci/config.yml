@@ -108,6 +108,8 @@ jobs:
       - github-cli/setup
       - run:
           command: |
+            git tag -d $version
+            git push origin :refs/tags/$version
             gh release create $version --title "Binary Update - Caddy "$version"" --notes "Automated release from CircleCI" --repo igorferreir4/caddy ./artifacts/*
       - store_artifacts:
           path: ./artifacts
