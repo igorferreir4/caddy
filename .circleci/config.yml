@@ -111,7 +111,7 @@ jobs:
           repo: caddy
           dir: ./gitclone
       - run:
-          name: Create Release
+          name: Check and Create Release
           command: |
             cd ./gitclone
             if gh release view $version >/dev/null 2>&1; then
