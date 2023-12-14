@@ -14,19 +14,11 @@ jobs:
     executor: go-executor
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - go-linux-amd64-{{ checksum "go.sum" }}
       - run:
           name: Get XCADDY
           command: |
             go version
             go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-      - save_cache:
-          key: go-linux-amd64-{{ checksum "go.sum" }}
-          paths:
-            - "~/.cache/go-build"
-            - "~/go/pkg/mod"
       - run:
           name: Build Binaries
           command: |
@@ -49,19 +41,11 @@ jobs:
     executor: go-executor
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - go-linux-arm64-{{ checksum "go.sum" }}
       - run:
           name: Get XCADDY
           command: |
             go version
             go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-      - save_cache:
-          key: go-linux-arm64-{{ checksum "go.sum" }}
-          paths:
-            - "~/.cache/go-build"
-            - "~/go/pkg/mod"
       - run:
           name: Build Binaries
           command: |
@@ -75,19 +59,11 @@ jobs:
     executor: go-executor
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - go-win-amd64-{{ checksum "go.sum" }}
       - run:
           name: Get XCADDY
           command: |
             go version
             go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-      - save_cache:
-          key: go-win-amd64-{{ checksum "go.sum" }}
-          paths:
-            - "~/.cache/go-build"
-            - "~/go/pkg/mod"
       - run:
           name: Build Binaries
           command: |
@@ -101,19 +77,11 @@ jobs:
     executor: go-executor
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - go-win-arm64-{{ checksum "go.sum" }}
       - run:
           name: Get XCADDY
           command: |
             go version
             go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-      - save_cache:
-          key: go-win-arm64-{{ checksum "go.sum" }}
-          paths:
-            - "~/.cache/go-build"
-            - "~/go/pkg/mod"
       - run:
           name: Build Binaries
           command: |
@@ -137,11 +105,14 @@ jobs:
             ./artifacts/caddy-linux-amd64 version
             CADDY=$(./artifacts/caddy-linux-amd64 version)
             echo "version=$( echo $CADDY | head -n1 | cut -d " " -f1 )" >> $BASH_ENV
+            mkdir gitclone
       - github-cli/setup
       - github-cli/clone:
           repo: caddy
+          dir: ./gitclone
       - run:
           command: |
+            cd ./gitclone
             git tag -d $version
             git push origin :refs/tags/$version
             gh release create $version --title "Binary Update - Caddy "$version"" --notes "Automated release from CircleCI" --repo igorferreir4/caddy ./artifacts/*
