@@ -28,13 +28,16 @@ jobs:
             sh ./scripts/caddybuild-win-amd64.sh & \
             sh ./scripts/caddybuild-win-arm64.sh & \
             wait
+            mv caddy-linux-amd64 caddy-linux-arm64 caddy-windows-amd64.exe caddy-windows-arm64.exe artifacts/
       - persist_to_workspace:
-          root: .
+          root: ./artifacts
           paths:
             - caddy-linux-amd64
             - caddy-linux-arm64
             - caddy-windows-amd64.exe
-            - caddy-windows-amd64.exe
+            - caddy-windows-arm64.exe
+      - store_artifacts:
+          path: ./artifacts            
 
   create-release:
     description: Publish a new release tagged `vX.Y.Z`.
