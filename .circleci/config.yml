@@ -23,10 +23,25 @@ jobs:
           name: Build Binaries
           command: |
             mkdir artifacts
-            sh ./scripts/caddybuild-linux-amd64.sh
-            sh ./scripts/caddybuild-linux-arm64.sh
-            sh ./scripts/caddybuild-win-amd64.sh
-            sh ./scripts/caddybuild-win-arm64.sh
+            sh ./scripts/caddybuild-linux-amd64.sh & \
+            sh ./scripts/caddybuild-linux-arm64.sh & \
+            sh ./scripts/caddybuild-win-amd64.sh & \
+            sh ./scripts/caddybuild-win-arm64.sh & \
+            wait
+      - persist_to_workspace:
+          root: .
+          paths:
+            - caddy-linux-amd64
+            - caddy-linux-arm64
+            - caddy-windows-amd64.exe
+            - caddy-windows-amd64.exe
+
+  create-release:
+    description: Publish a new release tagged `vX.Y.Z`.
+    executor: go-executor
+    steps:
+      - attach_workspace:
+          at: ./artifacts
       - run:
           name: Get Binary Version
           command: |
@@ -36,7 +51,7 @@ jobs:
             echo "version=$( echo $CADDY | head -n1 | cut -d " " -f1 )" >> $BASH_ENV
       - github-release/create:
           tag: "$version"
-          title: "Binary Update - Caddy $version"
+          title: Binary Update - Caddy "$version"
           description: This release is version "$version".
           file-path: ./artifacts
           user: igorferreir4
@@ -46,3 +61,6 @@ workflows:
   build-caddy:
     jobs:
       - build-caddy
+      - create-release:
+          requires:
+            - build-caddy

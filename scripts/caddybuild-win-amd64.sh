@@ -1,4 +1,4 @@
-GOOS=windows GOARCH=amd64 xcaddy build --output ./artifacts/caddy-windows-amd64.exe \
+GOOS=windows GOARCH=amd64 xcaddy build --output ./caddy-windows-amd64.exe \
     --with github.com/caddy-dns/cloudflare \
     --with github.com/mholt/caddy-l4 \
     --with github.com/RussellLuo/caddy-ext/layer4 \
