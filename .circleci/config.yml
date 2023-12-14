@@ -6,7 +6,7 @@ orbs:
 jobs:
   build-caddy:
     docker:
-      - image: cimg/go@1.21.5
+      - image: cimg/go:1.21.5
     steps:
       - checkout
       - go/mod-download
