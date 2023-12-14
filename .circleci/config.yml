@@ -38,7 +38,7 @@ jobs:
 
   create-release:
     description: Publish a new release tagged `vX.Y.Z`.
-    executor: go-executor
+    executor: github-release/default
     steps:
       - attach_workspace:
           at: ./artifacts
