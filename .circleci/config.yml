@@ -33,7 +33,7 @@ jobs:
       #       echo "version=$( echo $vr | head -n1 | cut -d " " -f1 )" >> $BASH_ENV
       #       echo "tag_name=$( echo $vr | head -n1 | cut -d " " -f1 )" >> $BASH_ENV
       - persist_to_workspace:
-          root: ./artifacts
+          root: ./scripts
           paths:
             - caddy-linux-amd64
 
@@ -51,7 +51,7 @@ jobs:
           command: |
             sh ./scripts/caddybuild-linux-arm64.sh
       - persist_to_workspace:
-          root: ./artifacts
+          root: ./scripts
           paths:
             - caddy-linux-arm64
 
@@ -69,7 +69,7 @@ jobs:
           command: |
             sh ./scripts/caddybuild-win-amd64.sh
       - persist_to_workspace:
-          root: ./artifacts
+          root: ./scripts
           paths:
             - caddy-win-amd64.exe
 
@@ -87,7 +87,7 @@ jobs:
           command: |
             sh ./scripts/caddybuild-linux-arm64.sh
       - persist_to_workspace:
-          root: ./artifacts
+          root: ./scripts
           paths:
             - caddy-win-arm64.exe
 
@@ -96,12 +96,12 @@ jobs:
     executor: github-release/default
     steps:
       - attach_workspace:
-          at: ./artifacts
+          at: ./scripts
       - run:
           name: Get Binary Version
           command: |
-            ls ./artifacts
-            CADDY=$(./artifacts/caddy-linux-amd64 version)
+            ls ./scripts
+            CADDY=$(./scripts/caddy-linux-amd64 version)
             vr="${CADDY}"
             echo "version=$( echo $vr | head -n1 | cut -d " " -f1 )" >> $BASH_ENV
             echo "tag_name=$( echo $vr | head -n1 | cut -d " " -f1 )" >> $BASH_ENV
@@ -109,7 +109,7 @@ jobs:
           tag: $version
           title: Binary Update - Caddy $version
           description: This release is version $version .
-          file-path: ./artifacts
+          file-path: ./scripts
           user: igorferreir4
           repository: caddy
 
