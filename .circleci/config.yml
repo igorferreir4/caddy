@@ -14,11 +14,18 @@ jobs:
     executor: go-executor
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - go-linux-amd64-{{ checksum "go.sum" }}
       - run:
           name: Get XCADDY
           command: |
             go version
             go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+      - save_cache:
+          key: go-linux-amd64-{{ checksum "go.sum" }}
+          paths:
+            - "/home/circleci/go/pkg/mod"
       - run:
           name: Build Binaries
           command: |
@@ -41,11 +48,18 @@ jobs:
     executor: go-executor
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - go-linux-arm64-{{ checksum "go.sum" }}
       - run:
           name: Get XCADDY
           command: |
             go version
             go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+      - save_cache:
+          key: go-linux-arm64-{{ checksum "go.sum" }}
+          paths:
+            - "/home/circleci/go/pkg/mod"
       - run:
           name: Build Binaries
           command: |
@@ -59,11 +73,18 @@ jobs:
     executor: go-executor
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - go-win-amd64-{{ checksum "go.sum" }}
       - run:
           name: Get XCADDY
           command: |
             go version
             go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+      - save_cache:
+          key: go-win-amd64-{{ checksum "go.sum" }}
+          paths:
+            - "/home/circleci/go/pkg/mod"
       - run:
           name: Build Binaries
           command: |
@@ -77,11 +98,18 @@ jobs:
     executor: go-executor
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - go-win-arm64-{{ checksum "go.sum" }}
       - run:
           name: Get XCADDY
           command: |
             go version
             go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+      - save_cache:
+          key: go-win-arm64-{{ checksum "go.sum" }}
+          paths:
+            - "/home/circleci/go/pkg/mod"
       - run:
           name: Build Binaries
           command: |
@@ -115,6 +143,7 @@ jobs:
             cd ./gitclone
             git tag -d $version
             git push origin :refs/tags/$version
+            cd ../
             gh release create $version --title "Binary Update - Caddy "$version"" --notes "Automated release from CircleCI" --repo igorferreir4/caddy ./artifacts/*
       - store_artifacts:
           path: ./artifacts
