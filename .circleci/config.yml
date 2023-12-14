@@ -71,7 +71,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - caddy-win-amd64.exe
+            - caddy-windows-amd64.exe
 
   build-caddy-win-arm64:
     executor: go-executor
@@ -89,7 +89,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - caddy-win-arm64.exe
+            - caddy-windows-arm64.exe
 
   create-release:
     description: Publish a new release tagged `vX.Y.Z`.
