@@ -7,10 +7,10 @@ executors:
     resource_class: large
 
 orbs:
-  github-release: h-matsuo/github-release@0.1.3
+  gh: circleci/github-cli@2.3.0
 
 jobs:
-  build-caddy:
+  build-caddy-linux-amd64:
     executor: go-executor
     steps:
       - checkout
@@ -22,26 +22,79 @@ jobs:
       - run:
           name: Build Binaries
           command: |
-            mkdir artifacts
-            sh ./scripts/caddybuild-linux-amd64.sh & \
-            sh ./scripts/caddybuild-linux-arm64.sh & \
-            sh ./scripts/caddybuild-win-amd64.sh & \
-            sh ./scripts/caddybuild-win-arm64.sh & \
-            wait
-            mv caddy-linux-amd64 caddy-linux-arm64 caddy-windows-amd64.exe caddy-windows-arm64.exe artifacts/
+            sh ./scripts/caddybuild-linux-amd64.sh
+            chmod +x caddy-linux-amd64
+            ./caddy-linux-amd64 version
+      # - run:
+      #     name: Get Binary Version
+      #     command: |
+      #       CADDY=$(./caddy-linux-amd64 version)
+      #       vr="${CADDY}"
+      #       echo "version=$( echo $vr | head -n1 | cut -d " " -f1 )" >> $BASH_ENV
+      #       echo "tag_name=$( echo $vr | head -n1 | cut -d " " -f1 )" >> $BASH_ENV
       - persist_to_workspace:
-          root: ./artifacts
+          root: .
           paths:
             - caddy-linux-amd64
+
+  build-caddy-linux-arm64:
+    executor: go-executor
+    steps:
+      - checkout
+      - run:
+          name: Get XCADDY
+          command: |
+            go version
+            go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+      - run:
+          name: Build Binaries
+          command: |
+            sh ./scripts/caddybuild-linux-arm64.sh
+      - persist_to_workspace:
+          root: .
+          paths:
             - caddy-linux-arm64
+
+  build-caddy-win-amd64:
+    executor: go-executor
+    steps:
+      - checkout
+      - run:
+          name: Get XCADDY
+          command: |
+            go version
+            go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+      - run:
+          name: Build Binaries
+          command: |
+            sh ./scripts/caddybuild-win-amd64.sh
+      - persist_to_workspace:
+          root: .
+          paths:
             - caddy-windows-amd64.exe
-            - caddy-windows-arm64.exe
-      - store_artifacts:
-          path: ./artifacts            
+
+  build-caddy-win-arm64:
+    executor: go-executor
+    steps:
+      - checkout
+      - run:
+          name: Get XCADDY
+          command: |
+            go version
+            go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+      - run:
+          name: Build Binaries
+          command: |
+            sh ./scripts/caddybuild-win-arm64.sh
+      - persist_to_workspace:
+          root: .
+          paths:
+            - caddy-windows-arm64.exe       
 
   create-release:
-    description: Publish a new release tagged `vX.Y.Z`.
-    executor: github-release/default
+    docker:
+      - image: cimg/base:stable
+    resource_class: small
     steps:
       - attach_workspace:
           at: ./artifacts
@@ -52,18 +105,27 @@ jobs:
             ./artifacts/caddy-linux-amd64 version
             CADDY=$(./artifacts/caddy-linux-amd64 version)
             echo "version=$( echo $CADDY | head -n1 | cut -d " " -f1 )" >> $BASH_ENV
-      - github-release/create:
-          tag: "$version"
+      - gh/release:
+          filters:
+            branches:
+              only:
+                - main
+          # notes-file: changelog.md
+          tag: $version
           title: Binary Update - Caddy "$version"
-          description: This release is version "$version".
-          file-path: ./artifacts
-          user: igorferreir4
-          repository: caddy
+      - store_artifacts:
+          path: ./artifacts
 
 workflows:
   build-caddy:
     jobs:
-      - build-caddy
+      - build-caddy-linux-amd64
+      - build-caddy-linux-arm64
+      - build-caddy-win-amd64
+      - build-caddy-win-arm64
       - create-release:
           requires:
-            - build-caddy
+            - build-caddy-linux-amd64
+            - build-caddy-linux-arm64
+            - build-caddy-win-amd64
+            - build-caddy-win-arm64
