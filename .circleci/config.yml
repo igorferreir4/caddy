@@ -105,10 +105,10 @@ jobs:
             ./artifacts/caddy-linux-amd64 version
             CADDY=$(./artifacts/caddy-linux-amd64 version)
             echo "version=$( echo $CADDY | head -n1 | cut -d " " -f1 )" >> $BASH_ENV
+      - github-cli/setup
       - run:
           command: |
             gh release create "$version" --title "Binary Update - Caddy "$version"" --notes "Automated release from CircleCI" ./artifacts/*
-            gh pr create --title "Bugfix from $CIRCLE_BRANCH"
       - store_artifacts:
           path: ./artifacts
 
