@@ -7,6 +7,7 @@ jobs:
   build-caddy:
     docker:
       - image: cimg/go:1.21.5
+    resource_class: large
     steps:
       - checkout
       # - go/mod-download
@@ -14,15 +15,16 @@ jobs:
           name: Get XCADDY
           command: |
             go version
-      #       go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-      # - run:
-      #     name: Build Binaries
-      #     command: |
-      #       sh ./scripts/caddybuild-linux-amd64.sh
-      #       sh ./scripts/caddybuild-linux-arm64.sh
-      #       sh ./scripts/caddybuild-win-amd64.sh
-      #       sh ./scripts/caddybuild-win-arm64.sh
-      #       chmod +x caddy-linux-amd64
+            go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+      - run:
+          name: Build Binaries
+          command: |
+            sh ./scripts/caddybuild-linux-amd64.sh
+            sh ./scripts/caddybuild-linux-arm64.sh
+            sh ./scripts/caddybuild-win-amd64.sh
+            sh ./scripts/caddybuild-win-arm64.sh
+            chmod +x caddy-linux-amd64
+            ./caddy-linux-amd64 version
       # - run:
       #     name: Get Binary Version
       #     command: |
