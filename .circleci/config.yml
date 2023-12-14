@@ -141,8 +141,10 @@ jobs:
       - run:
           command: |
             cd ./gitclone
-            git tag -d $version
-            git push origin :refs/tags/$version
+            if git rev-parse "$version" >/dev/null 2>&1; then
+                git tag -d $version
+                git push origin :refs/tags/$version
+            fi
             cd ../
             gh release create $version --title "Binary Update - Caddy "$version"" --notes "Automated release from CircleCI" --repo igorferreir4/caddy ./artifacts/*
       - store_artifacts:
