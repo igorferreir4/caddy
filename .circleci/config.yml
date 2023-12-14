@@ -1,7 +1,7 @@
 version: 2.1
 
-orbs:
-  go: circleci/go@1.10.0
+# orbs:
+#   go: circleci/go@1.10.0
 
 jobs:
   build-caddy:
@@ -9,7 +9,7 @@ jobs:
       - image: cimg/go:1.21.5
     steps:
       - checkout
-      - go/mod-download
+      # - go/mod-download
       - run:
           name: Get XCADDY
           command: |
