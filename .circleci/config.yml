@@ -85,7 +85,7 @@ jobs:
       - run:
           name: Build Binaries
           command: |
-            sh ./scripts/caddybuild-linux-arm64.sh
+            sh ./scripts/caddybuild-win-arm64.sh
       - persist_to_workspace:
           root: .
           paths:
