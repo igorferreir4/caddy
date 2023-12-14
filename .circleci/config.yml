@@ -7,7 +7,7 @@ executors:
     resource_class: large
 
 orbs:
-  github-cli: circleci/github-cli@1.1.0
+  github-cli: circleci/github-cli@2.3.0
 
 jobs:
   build-caddy-linux-amd64:
