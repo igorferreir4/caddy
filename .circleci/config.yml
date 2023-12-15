@@ -26,7 +26,7 @@ jobs:
             chmod +x caddy-linux-amd64
             ./caddy-linux-amd64 version
             mkdir artifacts
-            mv caddy-linux-amd64 caddy-linux-arm64 caddy-windows-amd64 caddy-windows-arm64 ./artifacts
+            mv caddy-linux-amd64 caddy-linux-arm64 caddy-windows-amd64.exe caddy-windows-arm64.exe ./artifacts
       - run:
           name: Get Binary Version
           command: |
