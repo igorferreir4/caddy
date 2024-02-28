@@ -3,7 +3,7 @@ version: 2.1
 executors:
   go-executor:
     docker:
-      - image: cimg/go:1.21.5
+      - image: cimg/go:1.22.0
     resource_class: large
 
 orbs:
@@ -22,7 +22,7 @@ jobs:
       - run:
           name: Build Binaries
           command: |
-            sh ./scripts/teste.sh
+            sh ./scripts/build-all.sh
             chmod +x caddy-linux-amd64
             ./caddy-linux-amd64 version
             mkdir artifacts
