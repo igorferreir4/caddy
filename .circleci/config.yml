@@ -93,31 +93,26 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Teste
+          name: Get Binary Version
           command: |
             ls ./artifacts
             ./artifacts/caddy-linux-amd64 version
-      # - run:
-      #     name: Get Binary Version
-      #     command: |
-      #       ls ./artifacts
-      #       ./artifacts/caddy-linux-amd64 version
-      #       CADDY=$(./artifacts/caddy-linux-amd64 version)
-      #       echo "version=$( echo $CADDY | head -n1 | cut -d " " -f1 )" >> $BASH_ENV
-      #       mkdir gitclone
-      # - github-cli/setup
-      # - github-cli/clone:
-      #     repo: caddy
-      #     dir: ./gitclone
-      # - run:
-      #     name: Create Release
-      #     command: |
-      #       cd ./gitclone
-      #       if gh release view $version >/dev/null 2>&1; then
-      #           gh release delete $version --cleanup-tag --yes
-      #       fi
-      #       cd ../
-      #       gh release create $version --title "Binary Update - Caddy "$version"" --notes "Automated release from CircleCI" --repo igorferreir4/caddy ./artifacts/*
+            CADDY=$(./artifacts/caddy-linux-amd64 version)
+            echo "version=$( echo $CADDY | head -n1 | cut -d " " -f1 )" >> $BASH_ENV
+            mkdir gitclone
+      - github-cli/setup
+      - github-cli/clone:
+          repo: caddy
+          dir: ./gitclone
+      - run:
+          name: Create Release
+          command: |
+            cd ./gitclone
+            if gh release view $version >/dev/null 2>&1; then
+                gh release delete $version --cleanup-tag --yes
+            fi
+            cd ../
+            gh release create $version --title "Binary Update - Caddy "$version"" --notes "Automated release from CircleCI" --repo igorferreir4/caddy ./artifacts/*
   
 workflows:
   build-caddy:
