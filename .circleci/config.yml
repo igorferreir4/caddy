@@ -23,11 +23,11 @@ jobs:
           name: Check cache path
           command: |
             go env GOCACHE
-      # - run:
-      #     name: Get XCADDY
-      #     command: |
-      #       go version
-      #       go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+      - run:
+          name: Get XCADDY
+          command: |
+            go version
+            go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
       # - run:
       #     name: Build Binaries
       #     command: |
