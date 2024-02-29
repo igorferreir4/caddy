@@ -162,6 +162,7 @@ jobs:
 
   export-to-github:
     executor: go-executor
+    resource_class: small
     steps:
       - attach_workspace:
           at: .
