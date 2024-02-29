@@ -44,7 +44,7 @@ jobs:
           # Must be an absolute path, or relative path from working_directory. This is a directory in the execution
           # environment which is taken to be the root directory of the workspace.
           root: .
-          # Must be relative path from root
+          # Must be relative path from root.
           paths:
             - artifacts
 
