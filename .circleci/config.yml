@@ -10,7 +10,7 @@ orbs:
   github-cli: circleci/github-cli@2.3.0
 
 jobs:
-  build-caddy-binary:
+  build-amd64:
     executor: go-executor
     steps:
       - checkout
@@ -22,34 +22,83 @@ jobs:
       - run:
           name: Build Binaries
           command: |
-            sh ./scripts/build-all.sh
+            sh ./scripts/build-amd64.sh
             chmod +x caddy-linux-amd64
             ./caddy-linux-amd64 version
             mkdir artifacts
-            mv caddy-linux-amd64 caddy-linux-arm64 caddy-windows-amd64.exe caddy-windows-arm64.exe ./artifacts
+            mv caddy-linux-amd64 caddy-windows-amd64.exe ./artifacts
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory. This is a directory in the execution
+          # environment which is taken to be the root directory of the workspace.
+          root: .
+          # Must be relative path from root
+          paths:
+            - artifacts
+
+  build-arm64:
+    executor: go-executor
+    resource_class: arm.large
+    steps:
+      - checkout
       - run:
-          name: Get Binary Version
+          name: Get XCADDY
+          command: |
+            go version
+            go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+      - run:
+          name: Build Binaries
+          command: |
+            sh ./scripts/build-arm64.sh
+            chmod +x caddy-linux-arm64
+            ./caddy-linux-arm64 version
+            mkdir artifacts
+            mv caddy-linux-arm64 caddy-windows-arm64.exe ./artifacts
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory. This is a directory in the execution
+          # environment which is taken to be the root directory of the workspace.
+          root: .
+          # Must be relative path from root
+          paths:
+            - artifacts
+
+  export-to-github:
+    executor: go-executor
+    steps:
+      - attach_workspace:
+          at: ./artifacts
+      - run:
+          name: Teste
           command: |
             ls ./artifacts
             ./artifacts/caddy-linux-amd64 version
-            CADDY=$(./artifacts/caddy-linux-amd64 version)
-            echo "version=$( echo $CADDY | head -n1 | cut -d " " -f1 )" >> $BASH_ENV
-            mkdir gitclone
-      - github-cli/setup
-      - github-cli/clone:
-          repo: caddy
-          dir: ./gitclone
-      - run:
-          name: Create Release
-          command: |
-            cd ./gitclone
-            if gh release view $version >/dev/null 2>&1; then
-                gh release delete $version --cleanup-tag --yes
-            fi
-            cd ../
-            gh release create $version --title "Binary Update - Caddy "$version"" --notes "Automated release from CircleCI" --repo igorferreir4/caddy ./artifacts/*
-
+      # - run:
+      #     name: Get Binary Version
+      #     command: |
+      #       ls ./artifacts
+      #       ./artifacts/caddy-linux-amd64 version
+      #       CADDY=$(./artifacts/caddy-linux-amd64 version)
+      #       echo "version=$( echo $CADDY | head -n1 | cut -d " " -f1 )" >> $BASH_ENV
+      #       mkdir gitclone
+      # - github-cli/setup
+      # - github-cli/clone:
+      #     repo: caddy
+      #     dir: ./gitclone
+      # - run:
+      #     name: Create Release
+      #     command: |
+      #       cd ./gitclone
+      #       if gh release view $version >/dev/null 2>&1; then
+      #           gh release delete $version --cleanup-tag --yes
+      #       fi
+      #       cd ../
+      #       gh release create $version --title "Binary Update - Caddy "$version"" --notes "Automated release from CircleCI" --repo igorferreir4/caddy ./artifacts/*
+  
 workflows:
   build-caddy:
     jobs:
-      - build-caddy-binary
+      - build-amd64
+      - build-arm64
+      - export-to-github:
+          requires:
+            - build-amd64
+            - build-arm64
