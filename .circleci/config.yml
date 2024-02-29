@@ -13,7 +13,7 @@ jobs:
   build-amd64:
     executor: go-executor
     environment:
-      GOCACHE: ./gocache
+      GOCACHE: /home/circleci/project/gocache
     steps:
       - checkout
       - restore_cache:
@@ -52,7 +52,7 @@ jobs:
     executor: go-executor
     resource_class: arm.large
     environment:
-      GOCACHE: ./gocache
+      GOCACHE: /home/circleci/project/gocache
     steps:
       - checkout
       - restore_cache:
