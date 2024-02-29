@@ -130,6 +130,8 @@ jobs:
       GOCACHE: /home/circleci/gocache
     steps:
       - checkout
+      - run:
+          command: ls -lah
       - restore_cache:
           keys:
             - win-arm64-cache-
