@@ -10,7 +10,7 @@ orbs:
   github-cli: circleci/github-cli@2.3.0
 
 jobs:
-  build-linux-amd64:
+  build-amd64-linux:
     executor: go-executor
     environment:
       GOCACHE: /home/circleci/gocache
@@ -31,7 +31,7 @@ jobs:
       - run:
           name: Build Binaries
           command: |
-            sh ./scripts/build-linux-amd64.sh
+            sh ./scripts/build-amd64-linux.sh
             chmod +x caddy-linux-amd64
             ./caddy-linux-amd64 version
             mkdir artifacts
@@ -48,7 +48,7 @@ jobs:
           paths:
             - artifacts
 
-  build-win-amd64:
+  build-amd64-win:
     executor: go-executor
     environment:
       GOCACHE: /home/circleci/gocache
@@ -69,7 +69,7 @@ jobs:
       - run:
           name: Build Binaries
           command: |
-            sh ./scripts/build-win-amd64.sh
+            sh ./scripts/build-amd64-win.sh
             mkdir artifacts
             mv caddy-windows-amd64.exe ./artifacts
       - save_cache:
@@ -84,7 +84,7 @@ jobs:
           paths:
             - artifacts
 
-  build-linux-arm64:
+  build-arm64-linux:
     executor: go-executor
     resource_class: arm.large
     environment:
@@ -106,7 +106,7 @@ jobs:
       - run:
           name: Build Binaries
           command: |
-            sh ./scripts/build-linux-arm64.sh
+            sh ./scripts/build-arm64-linux.sh
             chmod +x caddy-linux-arm64
             ./caddy-linux-arm64 version
             mkdir artifacts
@@ -123,7 +123,7 @@ jobs:
           paths:
             - artifacts
 
-  build-win-arm64:
+  build-arm64-win:
     executor: go-executor
     resource_class: arm.large
     environment:
@@ -145,7 +145,7 @@ jobs:
       - run:
           name: Build Binaries
           command: |
-            sh ./scripts/build-win-arm64.sh
+            sh ./scripts/build-arm64-win.sh
             mkdir artifacts
             mv caddy-windows-arm64.exe ./artifacts
       - save_cache:
@@ -190,13 +190,13 @@ jobs:
 workflows:
   build-caddy:
     jobs:
-      - build-linux-amd64
-      - build-win-amd64
-      - build-linux-arm64
-      - build-win-arm64
+      - build-amd64-linux
+      - build-amd64-win
+      - build-arm64-linux
+      - build-arm64-win
       - export-to-github:
           requires:
-            - build-linux-amd64
-            - build-win-amd64
-            - build-linux-arm64
-            - build-win-arm64
+            - build-amd64-linux
+            - build-amd64-win
+            - build-arm64-linux
+            - build-arm64-win
