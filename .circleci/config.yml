@@ -18,7 +18,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - amd64-cache
+            - amd64-cache-
       - run:
           name: Check cache path
           command: |
@@ -37,7 +37,7 @@ jobs:
             mkdir artifacts
             mv caddy-linux-amd64 caddy-windows-amd64.exe ./artifacts
       - save_cache:
-          key: amd64-cache
+          key: amd64-cache-{{ .BuildNum }}
           paths:
             - /home/circleci/gocache
       - persist_to_workspace:
@@ -57,7 +57,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - arm64-cache
+            - arm64-cache-
       - run:
           name: Check cache path
           command: |
@@ -76,7 +76,7 @@ jobs:
             mkdir artifacts
             mv caddy-linux-arm64 caddy-windows-arm64.exe ./artifacts
       - save_cache:
-          key: arm64-cache
+          key: arm64-cache-{{ .BuildNum }}
           paths:
             - /home/circleci/gocache
       - persist_to_workspace:
