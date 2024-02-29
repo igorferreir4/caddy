@@ -13,7 +13,7 @@ jobs:
   build-amd64:
     executor: go-executor
     environment:
-      GOCACHE: /home/circleci/project/gocache
+      GOCACHE: /home/circleci/gocache
     steps:
       - checkout
       - restore_cache:
@@ -28,31 +28,31 @@ jobs:
           command: |
             go version
             go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-      # - run:
-      #     name: Build Binaries
-      #     command: |
-      #       sh ./scripts/build-amd64.sh
-      #       chmod +x caddy-linux-amd64
-      #       ./caddy-linux-amd64 version
-      #       mkdir artifacts
-      #       mv caddy-linux-amd64 caddy-windows-amd64.exe ./artifacts
-      # - save_cache:
-      #     key: amd64-cache
-      #     paths:
-      #       - ~/gocache
-      # - persist_to_workspace:
-      #     # Must be an absolute path, or relative path from working_directory. This is a directory in the execution
-      #     # environment which is taken to be the root directory of the workspace.
-      #     root: .
-      #     # Must be relative path from root
-      #     paths:
-      #       - artifacts
+      - run:
+          name: Build Binaries
+          command: |
+            sh ./scripts/build-amd64.sh
+            chmod +x caddy-linux-amd64
+            ./caddy-linux-amd64 version
+            mkdir artifacts
+            mv caddy-linux-amd64 caddy-windows-amd64.exe ./artifacts
+      - save_cache:
+          key: amd64-cache
+          paths:
+            - /home/circleci/gocache
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory. This is a directory in the execution
+          # environment which is taken to be the root directory of the workspace.
+          root: .
+          # Must be relative path from root
+          paths:
+            - artifacts
 
   build-arm64:
     executor: go-executor
     resource_class: arm.large
     environment:
-      GOCACHE: /home/circleci/project/gocache
+      GOCACHE: /home/circleci/gocache
     steps:
       - checkout
       - restore_cache:
@@ -62,30 +62,30 @@ jobs:
           name: Check cache path
           command: |
             go env GOCACHE
-      # - run:
-      #     name: Get XCADDY
-      #     command: |
-      #       go version
-      #       go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-      # - run:
-      #     name: Build Binaries
-      #     command: |
-      #       sh ./scripts/build-arm64.sh
-      #       chmod +x caddy-linux-arm64
-      #       ./caddy-linux-arm64 version
-      #       mkdir artifacts
-      #       mv caddy-linux-arm64 caddy-windows-arm64.exe ./artifacts
-      # - save_cache:
-      #     key: arm64-cache
-      #     paths:
-      #       - ~/gocache
-      # - persist_to_workspace:
-      #     # Must be an absolute path, or relative path from working_directory. This is a directory in the execution
-      #     # environment which is taken to be the root directory of the workspace.
-      #     root: .
-      #     # Must be relative path from root
-      #     paths:
-      #       - artifacts
+      - run:
+          name: Get XCADDY
+          command: |
+            go version
+            go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+      - run:
+          name: Build Binaries
+          command: |
+            sh ./scripts/build-arm64.sh
+            chmod +x caddy-linux-arm64
+            ./caddy-linux-arm64 version
+            mkdir artifacts
+            mv caddy-linux-arm64 caddy-windows-arm64.exe ./artifacts
+      - save_cache:
+          key: arm64-cache
+          paths:
+            - /home/circleci/gocache
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory. This is a directory in the execution
+          # environment which is taken to be the root directory of the workspace.
+          root: .
+          # Must be relative path from root
+          paths:
+            - artifacts
 
   export-to-github:
     executor: go-executor
