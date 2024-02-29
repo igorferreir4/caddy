@@ -190,9 +190,13 @@ jobs:
 workflows:
   build-caddy:
     jobs:
-      - build-amd64
-      - build-arm64
+      - build-linux-amd64
+      - build-win-amd64
+      - build-linux-arm64
+      - build-win-arm64
       - export-to-github:
           requires:
-            - build-amd64
-            - build-arm64
+            - build-linux-amd64
+            - build-win-amd64
+            - build-linux-arm64
+            - build-win-arm64
