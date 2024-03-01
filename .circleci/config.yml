@@ -6,28 +6,10 @@ executors:
       - image: cimg/go:1.22.0
     resource_class: large
 
-parameters:
-  image-tag:
-    type: string
-    default: "21.6.0"
-  workingdir:
-    type: string
-    default: "~/main"
-
 orbs:
   github-cli: circleci/github-cli@2.3.0
 
 jobs:
-  teste:
-    docker:
-      - image: cimg/node:<< pipeline.parameters.image-tag >>
-    environment:
-      IMAGETAG: << pipeline.parameters.image-tag >>
-    working_directory: << pipeline.parameters.workingdir >>
-    steps:
-      - run: echo "Image tag used was ${IMAGETAG}"
-      - run: echo "$(pwd) == << pipeline.parameters.workingdir >>"
-
   build-amd64-linux:
     executor: go-executor
     environment:
@@ -209,14 +191,13 @@ jobs:
 workflows:
   build-caddy:
     jobs:
-      - teste
-      # - build-amd64-linux
-      # - build-amd64-win
-      # - build-arm64-linux
-      # - build-arm64-win
-      # - export-to-github:
-      #     requires:
-      #       - build-amd64-linux
-      #       - build-amd64-win
-      #       - build-arm64-linux
-      #       - build-arm64-win
+      - build-amd64-linux
+      - build-amd64-win
+      - build-arm64-linux
+      - build-arm64-win
+      - export-to-github:
+          requires:
+            - build-amd64-linux
+            - build-amd64-win
+            - build-arm64-linux
+            - build-arm64-win
